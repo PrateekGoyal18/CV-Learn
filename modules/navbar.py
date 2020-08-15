@@ -1,7 +1,7 @@
 import streamlit as st
 from modules.opencv import extract, shift, rotate, rotate_bound
 
-def sidebar(image, selection):
+def navbar(image, selection):
     if selection == 'Color Extraction':
         color = st.sidebar.radio("Select the color you want to extract",
             ('Red', 'Blue', 'Green'))
@@ -9,9 +9,9 @@ def sidebar(image, selection):
 
     elif selection == 'Shifting':
         x = st.sidebar.slider('Select the x-axis value',
-            0.0, 100.0)
+            0, image.shape[1])
         y = st.sidebar.slider('Select the y-axis value',
-            0.0, 100.0)
+            0, image.shape[0])
         mod_image = shift(image, x, y)
 
     elif selection == 'Rotation':
