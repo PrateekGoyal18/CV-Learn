@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from matplotlib import pyplot as plt
 
 def grayscale(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -66,6 +67,41 @@ def resize_wAR(image, width=None, height=None, inter=cv2.INTER_AREA):
         dim = (width, int(h*r))
     resized = cv2.resize(image, dim, interpolation=inter)
     return resized
+
+def blur(image, kernel, blur_type):
+    if blur_type == 'Average':
+        blurred = cv2.blur(image, (kernel,kernel))
+    elif blur_type == 'Gaussian':
+        blurred = cv2.GaussianBlur(image, (kernel,kernel), 0)
+    elif blur_type == 'Median':
+        blurred = cv2.medianBlur(image, kernel)
+    return blurred
+
+def hist(image, hist_type, channels):
+    if hist_type == 'Grayscale':
+        if channels == 3:
+            gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        else:
+            gray = image
+        hist = cv2.calcHist(images=[gray], channels=[0], mask=None, histSize=[256], ranges=[0,256])
+        plt.figure()
+        plt.title("Grayscale Histogram")
+        plt.xlabel("Intensities")
+        plt.ylabel("No. of Pixels")
+        plt.plot(hist)
+        plt.xlim([0, 256])
+    else:
+        chans = cv2.split(image)
+        colors = ("b", "g", "r")
+        plt.figure()
+        plt.title("Color Histogram")
+        plt.xlabel("Intensities")
+        plt.ylabel("No. of Pixels")
+        for (chan, color) in zip(chans, colors):
+            hist = cv2.calcHist(images=[chan], channels=[0], mask=None, histSize=[256], ranges=[0,256])
+            plt.plot(hist, color=color)
+            plt.xlim([0, 256])
+    return plt
 
 def rectMask(image):
     (cX, cY) = (image.shape[1]//2, image.shape[0]//2)

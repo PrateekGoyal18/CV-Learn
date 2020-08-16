@@ -1,7 +1,7 @@
 import streamlit as st
 from modules.opencv import *
 
-NAV_OPTIONS = ('Image Information', 'Grayscale', 'Color Extraction', 'Shifting', 'Rotation', 'Resize')
+NAV_OPTIONS = ('Image Information', 'Grayscale', 'Color Extraction', 'Shifting', 'Rotation', 'Resize', 'Blurring', 'Histogram')
 
 def navbar(image, channels, selection):
     if selection == NAV_OPTIONS[0]:
@@ -25,35 +25,28 @@ def navbar(image, channels, selection):
 
     elif selection == NAV_OPTIONS[2]:
         if channels == 3:
-            color = st.sidebar.radio("Select the color you want to extract",
-                ('Red', 'Blue', 'Green'))
+            color = st.sidebar.radio("Select the color you want to extract", ('Red', 'Blue', 'Green'))
             mod_image = extract(image, color)
         else:
             st.warning('The image is not in RGB format!!')
             mod_image = None
 
     elif selection == NAV_OPTIONS[3]:
-        x = st.sidebar.slider('Select the x-axis value',
-            0, image.shape[1])
-        y = st.sidebar.slider('Select the y-axis value',
-            0, image.shape[0])
+        x = st.sidebar.slider('Select the x-axis value', 0, image.shape[1])
+        y = st.sidebar.slider('Select the y-axis value', 0, image.shape[0])
         mod_image = shift(image, x, y)
 
     elif selection == NAV_OPTIONS[4]:
-        rotate_type = st.sidebar.radio("Select the sub-feature",
-            ('Basic Rotation', 'Bound Rotation'))
+        rotate_type = st.sidebar.radio("Select the sub-feature", ('Basic Rotation', 'Bound Rotation'))
         if rotate_type == 'Basic Rotation':
-            angle = st.sidebar.slider('Select an angle',
-                -360.0, 360.0)
+            angle = st.sidebar.slider('Select an angle', -360.0, 360.0)
             mod_image = rotate(image, angle)
         else:
-            angle = st.sidebar.slider('Select an angle',
-                -360.0, 360.0)
+            angle = st.sidebar.slider('Select an angle', -360.0, 360.0)
             mod_image = rotate_bound(image, angle)
 
     elif selection == NAV_OPTIONS[5]:
-        resize_type = st.sidebar.radio("Select the sub-feature",
-            ('Without Aspect Ratio', 'With Aspect Ratio'))
+        resize_type = st.sidebar.radio("Select the sub-feature", ('Without Aspect Ratio', 'With Aspect Ratio'))
         if resize_type == 'Without Aspect Ratio':
             width = st.sidebar.number_input('Enter the width:', min_value=1)
             height = st.sidebar.number_input('Enter the height:', min_value=1)
@@ -66,5 +59,22 @@ def navbar(image, channels, selection):
         else:
             width = st.sidebar.number_input('Enter the width:')
             height = st.sidebar.number_input('Enter the height:')
+
+    elif selection == NAV_OPTIONS[6]:
+        blur_type = st.sidebar.radio('Select the blurring type', ('Average Blur', 'Gaussian Blur', 'Median Blur', 'Bilateral Blur'))
+        kernel = st.sidebar.slider('Select the blur intensity', min_value=1, step=2)
+        mod_image = blur(image, kernel, blur_type[:-5])
+    
+    elif selection == NAV_OPTIONS[7]:
+        hist_type = st.sidebar.radio('Select the histogram technique', ('Grayscale Histogram', 'Color Histogram'))
+        if hist_type == 'Grayscale Histogram':
+            plt = hist(image, hist_type[:-10], channels)
+        else:
+            if channels == 3:
+                plt = hist(image, hist_type[:-10], channels)
+            else:
+                st.warning('The image is in Grayscale Mode, so Color Histogram is not possible!!')
+        st.pyplot(plt)
+        mod_image = None
 
     return mod_image

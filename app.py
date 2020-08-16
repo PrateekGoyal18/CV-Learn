@@ -1,5 +1,6 @@
 import streamlit as st
 from PIL import Image
+import cv2
 import os
 import sys
 from modules.navbar import *
@@ -10,7 +11,7 @@ code = '''
 def hello():
     print("Hello, Streamlit!")
 '''
-NAV_OPTIONS = ('Image Information', 'Grayscale', 'Color Extraction', 'Shifting', 'Rotation', 'Resize')
+NAV_OPTIONS = ('Image Information', 'Grayscale', 'Color Extraction', 'Shifting', 'Rotation', 'Resize', 'Blurring', 'Histogram')
 
 if __name__ == '__main__':
     st.beta_set_page_config(page_title='CV-Learn', page_icon=None, layout='centered', initial_sidebar_state='expanded')
@@ -22,7 +23,7 @@ if __name__ == '__main__':
         .link, .link:hover { text-decoration: underline; color: #1e6777 !important; font-weight: bold; }
         .image-info { display: flex; flex-wrap: wrap; text-align: center; justify-content: center; }
         .section { margin: 8px; padding: 20px; background-color: #cfe8cf; border: 1px solid #cfe8cf; border-radius: 15px; color: #3e613e; width: 215px; text-align: center; }
-        .section:hover { box-shadow: 6px 7px 19px -1px #537853; }
+        .section:hover { box-shadow: 3px 4px 10px -1px #537853; }
         </style>''', unsafe_allow_html=True)
 
     selection = st.sidebar.selectbox('What would you like to do?', NAV_OPTIONS)
@@ -30,16 +31,20 @@ if __name__ == '__main__':
     image_file = st.file_uploader("Choose an image", type=["png", "jpg", "jpeg"])
     if image_file is not None:
         image = Image.open(image_file)
-        st.image(image, caption='Uploaded Image', width=None, channels='RGB')
         img_array = np.array(image)
         channels = img_array.ndim
+        if channels == 3:
+            upload_image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+            st.image(upload_image, caption='Uploaded Image', width=None, channels='BGR')
+        else:
+            st.image(image, caption='Uploaded Image', width=None)
         # st.code(code, language='python')
 
-        mod_image = navbar(img_array, channels, selection)
+        mod_image = navbar(upload_image, channels, selection)
         if mod_image is not None:
-            if channels == 3:
-                st.image(mod_image, caption='Modified Image', width=None, channels='RGB')
-            else:
+            if channels == 3 and selection != 'Grayscale':
+                st.image(mod_image, caption='Modified Image', width=None, channels='BGR')
+            elif channels != 3 or selection == 'Grayscale':
                 st.image(mod_image, caption='Modified Image', width=None)
 
     st.sidebar.subheader('Contribution')
