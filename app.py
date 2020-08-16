@@ -30,7 +30,7 @@ if __name__ == '__main__':
     image_file = st.file_uploader("Choose an image", type=["png", "jpg", "jpeg"])
     if image_file is not None:
         image = Image.open(image_file)
-        st.image(image, caption='Uploaded Image', width=None, channels='BGR')
+        st.image(image, caption='Uploaded Image', width=None, channels='RGB')
         img_array = np.array(image)
         channels = img_array.ndim
         # st.code(code, language='python')
