@@ -74,7 +74,7 @@ def navbar(image, channels, selection):
                 plt = hist(image, hist_type[:-10], channels)
             else:
                 st.warning('The image is in Grayscale Mode, so Color Histogram is not possible!!')
-        st.pyplot(plt)
+        st.pyplot()
         mod_image = None
 
     return mod_image

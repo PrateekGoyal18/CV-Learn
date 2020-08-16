@@ -1,0 +1,32 @@
+.card { 
+	background-color: #dde9f3; 
+	border: 1px solid #dde9f3; 
+	border-radius: 5px; 
+	padding: 5px; 
+	color: #296e7f; 
+} 
+.link, .link:hover { 
+	text-decoration: underline; 
+	color: #1e6777 !important; 
+	font-weight: bold; 
+}
+
+.image-info { 
+	display: flex; 
+	flex-wrap: wrap; 
+	text-align: center; 
+	justify-content: center; 
+}
+.section { 
+	margin: 8px; 
+	padding: 20px; 
+	background-color: #cfe8cf; 
+	border: 1px solid #cfe8cf; 
+	border-radius: 15px; 
+	color: #3e613e; 
+	width: 215px; 
+	text-align: center; 
+}
+.section:hover { 
+	box-shadow: 3px 4px 10px -1px #537853; 
+}

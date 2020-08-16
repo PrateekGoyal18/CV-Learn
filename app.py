@@ -3,9 +3,12 @@ from PIL import Image
 import cv2
 import os
 import sys
+import time
 from modules.navbar import *
 from modules.opencv import *
+from modules.style import *
 import numpy as np
+import pandas as pd
 
 code = '''
 def hello():
@@ -14,20 +17,36 @@ def hello():
 NAV_OPTIONS = ('Image Information', 'Grayscale', 'Color Extraction', 'Shifting', 'Rotation', 'Resize', 'Blurring', 'Histogram')
 
 if __name__ == '__main__':
-    st.beta_set_page_config(page_title='CV-Learn', page_icon=None, layout='centered', initial_sidebar_state='expanded')
+    st.beta_set_page_config(page_title='CV-Learn', page_icon='None', layout='centered', initial_sidebar_state='expanded')
     st.set_option('deprecation.showfileUploaderEncoding', False)
     st.title('**Welcome to CV-Learn** :sunglasses:')  
     st.sidebar.title('Navigation')
-    st.markdown('''<style type="text/css"> 
-        .card { background-color: #dde9f3; border: 1px solid #dde9f3; border-radius: 5px; padding: 5px; color: #296e7f; } 
-        .link, .link:hover { text-decoration: underline; color: #1e6777 !important; font-weight: bold; }
-        .image-info { display: flex; flex-wrap: wrap; text-align: center; justify-content: center; }
-        .section { margin: 8px; padding: 20px; background-color: #cfe8cf; border: 1px solid #cfe8cf; border-radius: 15px; color: #3e613e; width: 215px; text-align: center; }
-        .section:hover { box-shadow: 3px 4px 10px -1px #537853; }
-        </style>''', unsafe_allow_html=True)
+    
+    local_css("style.css")
+    remote_css('https://fonts.googleapis.com/icon?family=Material+Icons')
+    # icon("search")
+
+    # progress_bar = st.progress(0)
+    # status_text = st.empty()
+    # for i in range(100):
+    #     progress_bar.progress(i + 1)
+    #     status_text.text(str(i)+'%')
+    #     time.sleep(0.05)
+    # status_text.text('Done!')
+
+    # """Add this in your streamlit app.py"""
+    # GA_JS = """Hello world!"""
+
+    # # Insert the script in the head tag of the static template inside your virtual environement
+    # index_path = pathlib.Path(st.__file__).parent / "static" / "index.html"
+    # soup = BeautifulSoup(index_path.read_text(), features="lxml")
+    # if not soup.find(id='custom-js'):
+    #     script_tag = soup.new_tag("script", id='custom-js')
+    #     script_tag.string = GA_JS
+    #     soup.head.append(script_tag)
+    #     index_path.write_text(str(soup))
 
     selection = st.sidebar.selectbox('What would you like to do?', NAV_OPTIONS)
-
     image_file = st.file_uploader("Choose an image", type=["png", "jpg", "jpeg"])
     if image_file is not None:
         image = Image.open(image_file)
@@ -37,10 +56,12 @@ if __name__ == '__main__':
             upload_image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
             st.image(upload_image, caption='Uploaded Image', width=None, channels='BGR')
         else:
-            st.image(image, caption='Uploaded Image', width=None)
+            upload_image = image
+            st.image(upload_image, caption='Uploaded Image', width=None)
         # st.code(code, language='python')
 
-        mod_image = navbar(upload_image, channels, selection)
+        upload_image_array = np.array(upload_image)
+        mod_image = navbar(upload_image_array, channels, selection)
         if mod_image is not None:
             if channels == 3 and selection != 'Grayscale':
                 st.image(mod_image, caption='Modified Image', width=None, channels='BGR')
