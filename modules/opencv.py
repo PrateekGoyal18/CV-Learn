@@ -1,15 +1,19 @@
 import cv2
 import numpy as np
 
+def grayscale(image):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    return gray
+
 def extract(image, color):
     (B, G, R) = cv2.split(image)
     zeros = np.zeros(image.shape[:2], dtype="uint8")
     if color.lower() == 'red' or color.lower() == 'r':
-        return cv2.merge([R, zeros, zeros])
+        return cv2.merge([zeros, zeros, R])
     elif color.lower() == 'green' or color.lower() == 'g':
         return cv2.merge([zeros, G, zeros])
     else:
-        return cv2.merge([zeros, zeros, B])
+        return cv2.merge([B, zeros, zeros])
 
 def shift(image, x, y):
     M = np.float32([[1, 0, x], [0, 1, y]])
@@ -43,8 +47,10 @@ def resize_woAR(image, width=None, height=None, inter=cv2.INTER_AREA):
         return image
     if width is None:
         dim = (w, height)
-    else:
+    elif height is None:
         dim = (width, h)
+    else:
+        dim = (width, height)
     resized = cv2.resize(image, dim, interpolation=inter)
     return resized
 

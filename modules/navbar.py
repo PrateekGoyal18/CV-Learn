@@ -1,20 +1,45 @@
 import streamlit as st
-from modules.opencv import extract, shift, rotate, rotate_bound
+from modules.opencv import *
 
-def navbar(image, selection):
-    if selection == 'Color Extraction':
-        color = st.sidebar.radio("Select the color you want to extract",
-            ('Red', 'Blue', 'Green'))
-        mod_image = extract(image, color)
+NAV_OPTIONS = ('Image Information', 'Grayscale', 'Color Extraction', 'Shifting', 'Rotation', 'Resize')
 
-    elif selection == 'Shifting':
+def navbar(image, channels, selection):
+    if selection == NAV_OPTIONS[0]:
+        if channels == 3:
+            channels = str(3) + ' (RGB)'
+        else:
+            channels = str(1) + ' (Grayscale)'
+        st.markdown('''<div class="image-info">
+            <div class="section">Height/Rows: ''' + str(image.shape[0]) + '''</div>
+            <div class="section">Width/Columns: ''' + str(image.shape[1]) + '''</div>
+            <div class="section">Channels: ''' + channels + '''</div>
+            </div>''', unsafe_allow_html=True)
+        mod_image = None
+
+    elif selection == NAV_OPTIONS[1]:
+        if channels == 3:
+            mod_image = grayscale(image)
+        else:
+            st.warning('The image is already in Grayscale Mode!!')
+            mod_image = None
+
+    elif selection == NAV_OPTIONS[2]:
+        if channels == 3:
+            color = st.sidebar.radio("Select the color you want to extract",
+                ('Red', 'Blue', 'Green'))
+            mod_image = extract(image, color)
+        else:
+            st.warning('The image is not in RGB format!!')
+            mod_image = None
+
+    elif selection == NAV_OPTIONS[3]:
         x = st.sidebar.slider('Select the x-axis value',
             0, image.shape[1])
         y = st.sidebar.slider('Select the y-axis value',
             0, image.shape[0])
         mod_image = shift(image, x, y)
 
-    elif selection == 'Rotation':
+    elif selection == NAV_OPTIONS[4]:
         rotate_type = st.sidebar.radio("Select the sub-feature",
             ('Basic Rotation', 'Bound Rotation'))
         if rotate_type == 'Basic Rotation':
@@ -26,14 +51,20 @@ def navbar(image, selection):
                 -360.0, 360.0)
             mod_image = rotate_bound(image, angle)
 
-    elif selection == 'Resize':
+    elif selection == NAV_OPTIONS[5]:
         resize_type = st.sidebar.radio("Select the sub-feature",
             ('Without Aspect Ratio', 'With Aspect Ratio'))
         if resize_type == 'Without Aspect Ratio':
+            width = st.sidebar.number_input('Enter the width:', min_value=1)
+            height = st.sidebar.number_input('Enter the height:', min_value=1)
+            if width == 1:
+                mod_image = resize_woAR(image, height=int(height))
+            elif height == 1:
+                mod_image = resize_woAR(image, width=int(width))
+            else:
+                mod_image = resize_woAR(image, width=int(width), height=int(height))
+        else:
             width = st.sidebar.number_input('Enter the width:')
             height = st.sidebar.number_input('Enter the height:')
-        else:
-            width = st.sidebar.input()
-            height = st.sidebar.input()
 
     return mod_image
