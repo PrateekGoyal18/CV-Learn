@@ -1,15 +1,6 @@
 import streamlit as st
-from PIL import Image
-import cv2
-import os
-import sys
-import time
-from modules.image_options import *
-from modules.opencv import *
 from modules.style import *
 from modules.pages import *
-import numpy as np
-import pandas as pd
 
 code = '''
 def hello():
@@ -42,17 +33,3 @@ if __name__ == '__main__':
 
     page_name = st.sidebar.radio('Go to', PAGE_NAV_OPTIONS)
     page(page_name)
-
-    # st.sidebar.subheader('Contribution')
-    # st.sidebar.info('This is an open source project and you are welcome to contribute your awesome comments, questions and resources as issues or pull requests to the source code.')
-    # st.sidebar.subheader('About')
-    # st.sidebar.info('This app is maintained by Prateek Goyal. You can learn more about me at: https://prateekgoyal18.github.io/')
-
-    # st.sidebar.subheader('Contribution')
-    # st.sidebar.markdown('''<div class="card">
-    #     <span>This is an open source project and you are welcome to contribute your awesome comments, questions and resources as issues or pull requests to the source code.</span>
-    #     </div>''', unsafe_allow_html=True)
-    # st.sidebar.subheader('About')
-    # st.sidebar.markdown('''<div class="card">
-    #     <span>This app is maintained by Prateek Goyal. You can learn more about me <a class="link" href="https://prateekgoyal18.github.io/" target="_blank">here</a>.</span>
-    #     </div>''', unsafe_allow_html=True)

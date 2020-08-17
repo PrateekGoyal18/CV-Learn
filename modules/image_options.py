@@ -40,10 +40,10 @@ def image_op(image, channels, selection):
         rotate_type = st.sidebar.radio("Select the sub-feature", ('Basic Rotation', 'Bound Rotation'))
         if rotate_type == 'Basic Rotation':
             angle = st.sidebar.slider('Select an angle', -360.0, 360.0)
-            mod_image = rotate(image, angle)
+            mod_image = rotate(image, angle, bound=False)
         else:
             angle = st.sidebar.slider('Select an angle', -360.0, 360.0)
-            mod_image = rotate_bound(image, angle)
+            mod_image = rotate(image, angle, bound=True)
 
     elif selection == IMAGE_NAV_OPTIONS[5]:
         resize_type = st.sidebar.radio("Select the sub-feature", ('Without Aspect Ratio', 'With Aspect Ratio'))
@@ -51,14 +51,21 @@ def image_op(image, channels, selection):
             width = st.sidebar.number_input('Enter the width:', min_value=1)
             height = st.sidebar.number_input('Enter the height:', min_value=1)
             if width == 1:
-                mod_image = resize_woAR(image, height=int(height))
+                (dim, mod_image) = resize(image, height=int(height), AR=False)
             elif height == 1:
-                mod_image = resize_woAR(image, width=int(width))
+                (dim, mod_image) = resize(image, width=int(width), AR=False)
             else:
-                mod_image = resize_woAR(image, width=int(width), height=int(height))
+                (dim, mod_image) = resize(image, width=int(width), height=int(height), AR=False)
         else:
-            width = st.sidebar.number_input('Enter the width:')
-            height = st.sidebar.number_input('Enter the height:')
+            width = st.sidebar.number_input('Enter the width:', min_value=2)
+            height = st.sidebar.number_input('Enter the height:', min_value=2)
+            if width == 2 and height != 2:
+                (dim, mod_image) = resize(image, width=None, height=int(height), AR=True)
+            elif width != 2 and height == 2:
+                (dim, mod_image) = resize(image, width=int(width), height=None, AR=True)
+            else:
+                (dim, mod_image) = resize(image, width=int(width), height=int(height), AR=True)
+        st.text('The new image dimensions are: ' + str(dim))
 
     elif selection == IMAGE_NAV_OPTIONS[6]:
         blur_type = st.sidebar.radio('Select the blurring type', ('Average Blur', 'Gaussian Blur', 'Median Blur', 'Bilateral Blur'))

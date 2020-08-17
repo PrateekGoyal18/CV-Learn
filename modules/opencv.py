@@ -6,6 +6,7 @@ def grayscale(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     return gray
 
+
 def extract(image, color):
     (B, G, R) = cv2.split(image)
     zeros = np.zeros(image.shape[:2], dtype="uint8")
@@ -16,57 +17,57 @@ def extract(image, color):
     else:
         return cv2.merge([B, zeros, zeros])
 
+
 def shift(image, x, y):
     M = np.float32([[1, 0, x], [0, 1, y]])
     shifted = cv2.warpAffine(image, M, (image.shape[1], image.shape[0]))
     return shifted
 
-def rotate(image, angle, center=None, scale=1.0):
+
+def rotate(image, angle, center=None, scale=1.0, bound=False):
     (h, w) = image.shape[:2]
-    if center is None:
-        center = (w // 2, h // 2)
-    M = cv2.getRotationMatrix2D(center, angle, scale)
-    rotated = cv2.warpAffine(image, M, (w, h))
+    if bound == False:
+        if center is None:
+            center = (w // 2, h // 2)
+        M = cv2.getRotationMatrix2D(center, angle, scale)
+        rotated = cv2.warpAffine(image, M, (w, h))
+    else:
+        (cX, cY) = (w / 2, h / 2)
+        M = cv2.getRotationMatrix2D((cX, cY), -angle, 1.0)
+        cos = np.abs(M[0, 0])
+        sin = np.abs(M[0, 1])
+        nW = int((h * sin) + (w * cos))
+        nH = int((h * cos) + (w * sin))
+        M[0, 2] += (nW / 2) - cX
+        M[1, 2] += (nH / 2) - cY
+        rotated = cv2.warpAffine(image, M, (nW, nH))
     return rotated
 
-def rotate_bound(image, angle):
-    (h, w) = image.shape[:2]
-    (cX, cY) = (w / 2, h / 2)
-    M = cv2.getRotationMatrix2D((cX, cY), -angle, 1.0)
-    cos = np.abs(M[0, 0])
-    sin = np.abs(M[0, 1])
-    nW = int((h * sin) + (w * cos))
-    nH = int((h * cos) + (w * sin))
-    M[0, 2] += (nW / 2) - cX
-    M[1, 2] += (nH / 2) - cY
-    rotated_bound = cv2.warpAffine(image, M, (nW, nH))
-    return rotated_bound
 
-def resize_woAR(image, width=None, height=None, inter=cv2.INTER_AREA):
+def resize(image, width=None, height=None, inter=cv2.INTER_AREA, AR=False):
     (h, w) = image.shape[:2]
-    if width is None and height is None:
-        return image
-    if width is None:
-        dim = (w, height)
-    elif height is None:
-        dim = (width, h)
+    if AR == False:
+        if width is None and height is None:
+            resized = image
+        elif width is None:
+            dim = (w, height)
+        elif height is None:
+            dim = (width, h)
+        else:
+            dim = (width, height)
+        resized = cv2.resize(image, dim, interpolation=inter)
     else:
-        dim = (width, height)
-    resized = cv2.resize(image, dim, interpolation=inter)
-    return resized
+        if width is None and height is None:
+            resized = image
+        elif width is None:
+            r = height/float(h)
+            dim = (int(w*r), height)
+        else:
+            r = width/float(w)
+            dim = (width, int(h*r))
+        resized = cv2.resize(image, dim, interpolation=inter)
+    return dim, resized
 
-def resize_wAR(image, width=None, height=None, inter=cv2.INTER_AREA):
-    (h, w) = image.shape[:2]
-    if width is None and height is None:
-        return image
-    if width is None:
-        r = height/float(h)
-        dim = (int(w*r), height)
-    else:
-        r = width/float(w)
-        dim = (width, int(h*r))
-    resized = cv2.resize(image, dim, interpolation=inter)
-    return resized
 
 def blur(image, kernel, blur_type):
     if blur_type == 'Average':
@@ -76,6 +77,7 @@ def blur(image, kernel, blur_type):
     elif blur_type == 'Median':
         blurred = cv2.medianBlur(image, kernel)
     return blurred
+
 
 def hist(image, hist_type, channels):
     if hist_type == 'Grayscale':
@@ -103,26 +105,22 @@ def hist(image, hist_type, channels):
             plt.xlim([0, 256])
     return plt
 
-def rectMask(image):
+
+def mask(image, mask_type):
     (cX, cY) = (image.shape[1]//2, image.shape[0]//2)
     mask = np.zeros(image.shape[:2], dtype="uint8")
-    cv2.rectangle(mask, (cX-75, cY-75), (cX+75, cY+75), 255, -1)
+    if rect in mask_type:
+        cv2.rectangle(mask, (cX-75, cY-75), (cX+75, cY+75), 255, -1)
+    elif cir in mask_type:
+        cv2.circle(mask_cir, (cX, cY), 100, 255, -1)
     masked = cv2.bitwise_and(image, image, mask=mask)
     return masked
 
-def cirMask(image):
-    (cX, cY) = (image.shape[1]//2, image.shape[0]//2)
-    mask = np.zeros(image.shape[:2], dtype="uint8")
-    cv2.circle(mask_cir, (cX, cY), 100, 255, -1)
-    masked = cv2.bitwise_and(image, image, mask=mask)
-    return masked
 
-def addition(image, value):
+def arithmetic_op(image, value, operator):
     M = np.ones(image.shape, dtype="uint8")*value
-    added = cv2.add(image, M)
-    return added
-
-def subtraction(image, value):
-    M = np.ones(image.shape, dtype="uint8")*value
-    subtracted = cv2.subtract(image, M)
-    return subtracted
+    if add in operator:
+        arithmetic = cv2.add(image, M)
+    elif sub in operator:
+        arithmetic = cv2.subtract(image, M)
+    return arithmetic
