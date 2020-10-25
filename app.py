@@ -1,13 +1,7 @@
 import streamlit as st
 from modules.style import *
 from modules.pages import *
-
-code = '''
-def hello():
-    print("Hello, Streamlit!")
-'''
-PAGE_NAV_OPTIONS = ('Home', 'Image Options', 'About')
-IMAGE_NAV_OPTIONS = ('Image Information', 'Grayscale', 'Color Extraction', 'Shifting', 'Rotation', 'Resize', 'Blurring', 'Histogram')
+from modules.vars import *
 
 if __name__ == '__main__':
     st.beta_set_page_config(page_title='CV-Learn', page_icon='None', layout='centered', initial_sidebar_state='expanded')
@@ -16,7 +10,7 @@ if __name__ == '__main__':
     st.sidebar.title('Navigation')
     
     local_css("assets/css/style.css")
-    remote_css('https://fonts.googleapis.com/icon?family=Material+Icons')
+    # remote_css('https://fonts.googleapis.com/icon?family=Material+Icons')
     # icon("search")
 
     # """Add this in your streamlit app.py"""
